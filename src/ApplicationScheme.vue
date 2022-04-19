@@ -69,6 +69,13 @@
                 this.editingMode = true;
             },
 
+            removeFolder (folder) {
+                const folderIndex = this.folders.indexOf(folder);
+                this.folders.splice(folderIndex, 1);
+
+                this.save();
+            },
+
             updateSelectedFolder (updatedFolder) {
                 const selectedFolderIndex = this.folders.indexOf(this.selectedFolder);
 
@@ -115,6 +122,8 @@
             :selectedFolder="selectedFolder"
             :editingModeIndicator="editingMode"
             @updateSelectedFolder = "updateSelectedFolder($event)"
+            @removeFolder = "removeFolder($event)"
+            @unselectFolder = "unselectFolder($event)"
         />
     </div>
 </template>

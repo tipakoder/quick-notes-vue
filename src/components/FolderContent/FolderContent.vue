@@ -20,16 +20,22 @@
                     description: "",
                     elements: []
                 },
+                folderBeforeEditing: null,
                 optionsList: [
                     {
                         title: "Редактировать",
                         click: () => {
+                            this.folderBeforeEditing = Object.assign({}, this.folder);
                             this.editingMode = !this.editingMode;
                         }
                     },
                     {
                         title: "Удалить",
-                        color: "red"
+                        color: "red",
+                        click: () => {
+                            this.$emit('removeFolder', this.selectedFolder);
+                            this.$emit('unselectFolder');
+                        }
                     }
                 ],
 
@@ -79,23 +85,37 @@
             },
 
             editingModeIndicator: function(value) {
+                if (value) {
+                    this.folderBeforeEditing = Object.assign({}, this.folder);
+                }
+
                 this.editingMode = value;
+            },
+
+            editingMode: function() {
+                for(let target of document.getElementsByTagName("textarea")) {
+                    console.log(target.scrollHeight);
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                }
             }
         },
 
         methods: {
             updateFolderData () {
-                this.$emit('updateSelectedFolder', this.folder);
+                this.$emit('updateSelectedFolder', this.folderBeforeEditing ?? this.folder);
             },
 
             applyEditing () {
                 this.updateFolderData();
+                this.folderBeforeEditing = null;
                 this.editingMode = false;
                 this.hideContextMenu();
             },
 
             cancelEditing () {
-                this.folder = Object.assign({}, this.selectedFolder);
+                this.folder = Object.assign({}, this.folderBeforeEditing);
+                this.folderBeforeEditing = null;
                 this.editingMode = false;
                 this.hideContextMenu();
             },
@@ -110,6 +130,11 @@
 
             hideContextMenu () {
                 this.contextMenuVisible = false;
+            },
+
+            textareaResize(e) {
+                e.target.style.height = 'auto';
+                e.target.style.height = `${e.target.scrollHeight}px`;
             },
 
             // Добавление элементов раздела
@@ -185,18 +210,27 @@
                 }"
                 class="folder-edit-input"
                 v-model="folder.description"
-            />
+                @input="this.textareaResize"
+            ></textarea>
 
             <template 
                 v-for="(element, id) in folder.elements"
                 :key="id"
             >
-                <textarea 
-                    cols="30" 
-                    rows="10"
-                    v-model="element.text"
-                />
-                {{id}}
+                <div class="folder-element-editing">
+                    <img
+                        @click="folder.elements.splice(id, 1)"
+                        src="@/assets/icons/remove.svg"
+                        class="icon-remove"
+                    >
+
+                    <textarea
+                        v-model="element.text"
+                        class="input-edit-text"
+
+                        @input="this.textareaResize"
+                    />
+                </div>
             </template>
 
             <div class="adding-elements-bar">
@@ -219,6 +253,15 @@
         >
             <h2>{{folder.title}}</h2>
             <p>{{folder.description}}</p>
+
+            <template 
+                v-for="(element, id) in folder.elements"
+                :key="id"
+            >
+                <p 
+                    v-if="element.tag === 'p'"
+                >{{element.text}}</p>
+            </template>
         </template>
     </div>
 
@@ -230,162 +273,4 @@
     </div>
 </template>
 
-<style>
-    #folder-menu {
-        position: fixed;
-        top: 22px;
-        right: 22px;
-    }
-
-    #folder-menu > .context-menu {
-        position: absolute;
-        top: 48px;
-        right: 0;
-    }
-
-    #folder-menu > .folder-menu-options {
-        display: flex;
-        align-items: center;
-        justify-content: end;
-        grid-gap: 16px;
-
-        background-color: transparent;
-    }
-
-    #folder-menu > .folder-menu-options > .action-button {
-        padding: 4px 8px;
-
-        cursor: pointer;
-
-        color: #FFF;
-        border-radius: 8px;
-    }
-
-    #folder-menu > .folder-menu-options > .apply {
-        background-color: var(--main-accent);
-    }
-
-    #folder-menu > .folder-menu-options > .cancel {
-        background-color: var(--red-modify);
-    }
-
-    #folder-menu .icon {
-        width: 32px;
-        height: 32px;
-
-        border-radius: 100px;
-        cursor: pointer;
-
-        transition: background-color 0.2s;
-    }
-
-    #folder-menu.visible .icon {
-        background-color: var(--main-bg-light-gray);
-    }
-
-    .folder-placeholder {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 300px;
-        right: 0;
-
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        background-color: var(--main-bg-dark-gray);
-    }
-
-    .folder-placeholder > .text {
-        padding: 4px 16px;
-
-        font-weight: 500;
-        font-size: 14px;
-        
-        color: #FFF;
-        border-radius: 80px;
-        background-color: var(--main-bg-dim-gray);
-    }
-
-    .folder-content {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 300px;
-        right: 0;
-
-        display: flex;
-        flex-direction: column;
-        grid-gap: 16px;
-
-        padding: 36px;
-
-        color: #FFF; 
-        background-color: var(--main-bg-dark-gray);
-    }
-
-    .folder-edit-input {
-        border: 0;
-        background-color: transparent;
-
-        resize: none;
-
-        font-weight: 400;
-        font-size: 14px;
-        color: #FFF;        
-    }
-
-    textarea.folder-edit-input {
-        max-height: 600px;
-    }
-
-    .folder-edit-input.empty {
-        caret-color: transparent;
-    }
-
-    .folder-edit-input::placeholder {
-        font-weight: 400;
-        font-size: 14px;
-        color: #FFF;
-    }
-
-    .folder-edit-input.title {
-        font-size: 24px;
-    }
-
-    .folder-edit-input.title::placeholder { 
-        font-size: 24px;
-    }
-
-    .folder-content .adding-elements-bar {
-        position: relative;
-
-        width: 100%;
-        height: 2px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-
-        background-color: var(--main-bg-dim-gray);
-    }
-
-    .folder-content .adding-elements-bar > img {
-        padding: 4px;
-
-        border-radius: 100px;
-        background-color: var(--main-bg-dim-gray);
-
-        cursor: pointer;
-    }
-
-    .folder-content .adding-elements-bar > .context-menu {
-        position: absolute;
-        top: 16px;
-
-        max-width: 300px;
-    }
-</style>
+<style src="./folderContent.css"></style>
