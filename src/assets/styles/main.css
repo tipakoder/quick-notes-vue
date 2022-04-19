@@ -1,0 +1,23 @@
+@import url("./fonts.css");
+
+* {
+    border: 0;
+    outline: 0;
+    padding: 0;
+    margin: 0;
+    
+    user-select: none;
+
+    font-family: RobotoMono;
+}
+
+:root {
+    --main-accent: #1F7928;
+    --main-bg-dark-gray: #18191D;
+    --main-bg-dim-gray: #282E33;
+    --main-bg-light-gray: #3D464E;
+    --main-second-gray: #242A2E;
+
+    --red-modify: #792929;
+    --red-modify-hover: #682222;
+}
