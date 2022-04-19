@@ -9,7 +9,8 @@
         },
 
         props: [
-            "selectedFolder"
+            "selectedFolder",
+            "editingModeIndicator"
         ],
         
         data () {
@@ -31,24 +32,55 @@
                         color: "red"
                     }
                 ],
+
+                elementsVariors: [
+                    {
+                        title: "Параграф",
+                        click: this.addingParagraph
+                    },
+                    {
+                        title: "Картинка",
+                        click: () => {
+
+                        }
+                    },
+                    {
+                        title: "Календарь",
+                        click: () => {
+
+                        }
+                    },
+                    {
+                        title: "Раздел",
+                        click: () => {
+
+                        }
+                    }
+                ],
+
                 contextMenuVisible: false,
+                contextAddingVisible: false,
                 editingMode: false
             }
         },
 
         watch: {
             selectedFolder: function (newValue) {
+                this.editingMode = false;
+
                 if (newValue !== null && newValue !== this.folder) {
                     newValue.title = newValue.title.trim();
                     newValue.description = newValue.description.trim();
-
-                    this.editingMode = false;
 
                     this.folder = Object.assign({}, newValue);
                 }
 
                 this.hideContextMenu();
-            } 
+            },
+
+            editingModeIndicator: function(value) {
+                this.editingMode = value;
+            }
         },
 
         methods: {
@@ -78,6 +110,17 @@
 
             hideContextMenu () {
                 this.contextMenuVisible = false;
+            },
+
+            // Добавление элементов раздела
+            // Параграф
+            addingParagraph () {
+                this.folder.elements.push(
+                    {
+                        tag: "p",
+                        text: ""
+                    }
+                );
             }
         }
 
@@ -143,6 +186,32 @@
                 class="folder-edit-input"
                 v-model="folder.description"
             />
+
+            <template 
+                v-for="(element, id) in folder.elements"
+                :key="id"
+            >
+                <textarea 
+                    cols="30" 
+                    rows="10"
+                    v-model="element.text"
+                />
+                {{id}}
+            </template>
+
+            <div class="adding-elements-bar">
+                <img 
+                    @click="contextAddingVisible = true"
+                    src="../../assets/icons/plus_small.svg"
+                >
+
+                <OptionsListVue 
+                    v-if="contextAddingVisible"
+                    :optionsList="elementsVariors"
+                    @click="contextAddingVisible = false"
+                    class="context-menu"
+                />
+            </div>
         </template>
 
         <template
@@ -269,7 +338,7 @@
     }
 
     textarea.folder-edit-input {
-        height: 100%;
+        max-height: 600px;
     }
 
     .folder-edit-input.empty {
@@ -288,5 +357,35 @@
 
     .folder-edit-input.title::placeholder { 
         font-size: 24px;
+    }
+
+    .folder-content .adding-elements-bar {
+        position: relative;
+
+        width: 100%;
+        height: 2px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        background-color: var(--main-bg-dim-gray);
+    }
+
+    .folder-content .adding-elements-bar > img {
+        padding: 4px;
+
+        border-radius: 100px;
+        background-color: var(--main-bg-dim-gray);
+
+        cursor: pointer;
+    }
+
+    .folder-content .adding-elements-bar > .context-menu {
+        position: absolute;
+        top: 16px;
+
+        max-width: 300px;
     }
 </style>

@@ -25,6 +25,7 @@
         data () {
             return {
                 selectedFolder: null,
+                editingMode: false,
                 folders: []
             }
         },
@@ -50,7 +51,10 @@
             },
 
             selectFolder (folder) {
+                this.editingMode = false;
                 this.selectedFolder = folder;
+
+                console.log(this.editingMode);
             },
 
             createFolder () {
@@ -62,6 +66,7 @@
 
                 this.folders.push(newFolder);
                 this.selectFolder(newFolder);
+                this.editingMode = true;
             },
 
             updateSelectedFolder (updatedFolder) {
@@ -108,6 +113,7 @@
 
         <FolderContentVue 
             :selectedFolder="selectedFolder"
+            :editingModeIndicator="editingMode"
             @updateSelectedFolder = "updateSelectedFolder($event)"
         />
     </div>
