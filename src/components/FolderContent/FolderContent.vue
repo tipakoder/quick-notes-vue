@@ -103,7 +103,7 @@
 
         methods: {
             updateFolderData () {
-                this.$emit('updateSelectedFolder', this.folderBeforeEditing ?? this.folder);
+                this.$emit('updateSelectedFolder', this.folder);
             },
 
             applyEditing () {
@@ -253,6 +253,8 @@
         >
             <h2>{{folder.title}}</h2>
             <p>{{folder.description}}</p>
+
+            <hr>
 
             <template 
                 v-for="(element, id) in folder.elements"

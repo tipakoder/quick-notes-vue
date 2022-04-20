@@ -36,6 +36,12 @@
                 if (e.keyCode == 27) {
                     this.unselectFolder();
                 }
+                // EDIT SHORCUT
+                if (e.keyCode == 69 && e.ctrlKey) {
+                    if (!this.editingMode) {
+                        this.editingMode = true;
+                    }
+                }
             },
 
             unselectFolder () {
