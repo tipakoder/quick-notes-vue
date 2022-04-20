@@ -211,7 +211,7 @@
                 class="folder-edit-input"
                 v-model="folder.description"
                 @input="this.textareaResize"
-            ></textarea>
+            />
 
             <template 
                 v-for="(element, id) in folder.elements"
@@ -239,7 +239,7 @@
                     src="../../assets/icons/plus_small.svg"
                 >
 
-                <OptionsListVue 
+                <textarea 
                     v-if="contextAddingVisible"
                     :optionsList="elementsVariors"
                     @click="contextAddingVisible = false"
@@ -251,8 +251,8 @@
         <template
             v-if="!editingMode"
         >
-            <h2>{{folder.title}}</h2>
-            <p>{{folder.description}}</p>
+            <h2 contenteditable="true">{{folder.title}}</h2>
+            <p v-html="folder.description"></p>
 
             <hr>
 
@@ -262,7 +262,8 @@
             >
                 <p 
                     v-if="element.tag === 'p'"
-                >{{element.text}}</p>
+                    v-html="element.text"
+                />
             </template>
         </template>
     </div>
